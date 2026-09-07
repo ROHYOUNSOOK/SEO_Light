@@ -1,0 +1,22 @@
+{
+  "name": "lighthouse-seo-checker",
+  "version": "1.0.0",
+  "description": "URL을 입력하면 Google Lighthouse(PageSpeed Insights)로 SEO를 점검하고 수정사항을 보여주는 웹앱",
+  "type": "module",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "dev": "node --env-file-if-exists=.env --watch server.js",
+    "dev:local": "cross-env ENGINE=local node --env-file-if-exists=.env server.js"
+  },
+  "devDependencies": {
+    "chrome-launcher": "^1.2.1",
+    "cross-env": "^7.0.3",
+    "express": "^4.21.2",
+    "lighthouse": "^13.4.1"
+  },
+  "license": "MIT"
+}
