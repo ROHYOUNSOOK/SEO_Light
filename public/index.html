@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>구글 SEO 검수</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=Shippori+Mincho+B1:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* ── 동안기획 디자인 토큰 (Light) ── */
+    --bg:#FFFFFF;--bg-off:#F5F3EE;--bg-dark:#232522;--bg-soft:rgba(23,23,23,.04);--bg-media:#191B1E;
+    --card:#FFFFFF;
+    --text:#171717;--muted:#666B67;--accent:#09BF41;--accent-deep:#067A21;
+    --line:rgba(23,23,23,.12);--line-2:rgba(23,23,23,.22);
+    --btn-face:#171717;--btn-fg:#FFFFFF;--btn-fill:#09BF41;
+    --good:#067A21;--good-bg:#e6f4ea;--mid:#e37400;--mid-bg:#fef7e0;--bad:#d93025;--bad-bg:#fce8e6;--info:#666B67;--info-bg:#F5F3EE;
+    --radius-sm:8px;--radius-md:12px;--radius-sheet:18px;--radius-pill:999px;
+    --ff-sans:"Noto Sans KR",sans-serif;--ff-serif:"Shippori Mincho B1",serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--ff-sans);background:var(--bg-off);color:var(--text);line-height:1.55;font-size:16px;-webkit-font-smoothing:antialiased}
+
+  /* ── Header / GNB ── */
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:rgba(255,255,255,.92)}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 50px}
+  header .wrap{display:flex;align-items:center;gap:14px;height:69px}
+  header h1{font-size:18px;margin:0;font-weight:700}
+  header h1 span{color:var(--text)}
+  header small{color:var(--muted);font-size:13px}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);white-space:nowrap}
+  .brand-mark{width:30px;height:30px;border-radius:var(--radius-sm);background:var(--bg-dark);display:grid;place-items:center;color:var(--accent);font-size:13px;font-weight:800;letter-spacing:-.08em}
+  .header-cta{margin-left:auto;white-space:nowrap}
+  @media(max-width:650px){
+    .wrap{padding:0 15px}
+    header .wrap{height:auto;min-height:60px;padding-top:10px;padding-bottom:10px;flex-wrap:wrap}
+    header small{display:none}
+    .header-cta{font-size:12px;padding:8px 14px!important}
+  }
+
+  /* ── Main ── */
+  main{padding:36px 0 64px}
+
+  /* ── Card ── */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-md);padding:28px}
+
+  /* ── Form ── */
+  form .row{display:flex;gap:12px;flex-wrap:wrap}
+  #url{flex:1;min-width:260px;font-size:16px;padding:14px 18px;border:1px solid var(--line);border-radius:var(--radius-pill);outline:none;background:var(--bg);font-family:var(--ff-sans);transition:border-color .2s,box-shadow .2s}
+  #url:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(9,191,65,.12)}
+  button.primary{background:var(--btn-face);color:var(--btn-fg);border:0;border-radius:var(--radius-pill);padding:0 30px;font-size:14.5px;font-weight:600;cursor:pointer;min-width:140px;height:54px;font-family:var(--ff-sans);transition:background .2s}
+  button.primary:hover{background:var(--btn-fill);color:var(--text)}
+  button.primary:disabled{opacity:.5;cursor:not-allowed}
+  button.primary:disabled:hover{background:var(--btn-face);color:var(--btn-fg)}
+  .opts{display:flex;gap:18px;flex-wrap:wrap;margin-top:16px;font-size:14px;color:var(--muted);align-items:center}
+  .opts label{display:flex;align-items:center;gap:6px;cursor:pointer}
+  .opts input[type="checkbox"]{accent-color:var(--accent)}
+  .seg{display:inline-flex;border:1px solid var(--line-2);border-radius:var(--radius-pill);overflow:hidden}
+  .seg label{padding:7px 16px;cursor:pointer;gap:0;font-size:14px;transition:background .2s,color .2s}
+  .seg input{display:none}
+  .seg label:has(input:checked){background:var(--btn-face);color:var(--btn-fg)}
+  .hint{font-size:13px;color:var(--muted);margin-top:12px;line-height:1.6}
+
+  /* ── Loading ── */
+  #loading{display:none;text-align:center;padding:56px 20px}
+  .spinner{width:44px;height:44px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .9s linear infinite;margin:0 auto 20px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  #loading p{margin:4px 0;color:var(--muted)}
+
+  /* ── Error ── */
+  #error{display:none;margin-top:16px;background:var(--bad-bg);color:var(--bad);border-radius:var(--radius-sm);padding:14px 18px;font-size:14px}
+
+  /* ── Result ── */
+  #result{display:none;margin-top:28px}
+  .top{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:start}
+  @media(max-width:760px){.top{grid-template-columns:1fr}}
+  .meta{font-size:13px;color:var(--muted);word-break:break-all;line-height:1.7}
+  .meta b{color:var(--text)}
+  .scores{display:flex;gap:20px;flex-wrap:wrap;margin-top:16px}
+  .gauge{text-align:center;width:88px}
+  .gauge .ring{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;margin:0 auto 6px;font-weight:700;font-size:20px;background:conic-gradient(var(--c) calc(var(--p)*1%),rgba(23,23,23,.08) 0);position:relative}
+  .gauge .ring::before{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--card)}
+  .gauge .ring span{position:relative;color:var(--c)}
+  .gauge small{font-size:12px;color:var(--muted)}
+  .shot{width:180px;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;background:var(--bg-off)}
+  .shot img{display:block;width:100%}
+  .metrics{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .metric{background:var(--bg-off);border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;position:relative;cursor:help}
+  .metric b{display:block;font-size:15px}
+  .metric.good b{color:var(--good)}.metric.mid b{color:var(--mid)}.metric.bad b{color:var(--bad)}
+  /* ── Metric Tooltip ── */
+  .metric .tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--bg-dark);color:#fff;font-size:12px;line-height:1.5;padding:10px 14px;border-radius:var(--radius-sm);width:240px;pointer-events:none;opacity:0;transition:opacity .15s;z-index:20;font-weight:400;text-align:left}
+  .metric .tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--bg-dark)}
+  .metric:hover .tip{opacity:1}
+  .metric .tip strong{color:var(--accent);font-weight:600}
+  @media(max-width:650px){.metric .tip{width:200px;left:0;transform:none}.metric .tip::after{left:20px}}
+
+  /* ── Filter Chips ── */
+  .summary{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0 16px}
+  .chip{border:1px solid var(--line);background:var(--card);border-radius:var(--radius-pill);padding:7px 16px;font-size:14px;cursor:pointer;display:flex;gap:6px;align-items:center;font-family:var(--ff-sans);transition:border-color .2s,background .2s}
+  .chip:hover{border-color:var(--line-2);background:var(--bg-off)}
+  .chip.active{border-color:var(--accent);background:rgba(9,191,65,.08);color:var(--accent-deep)}
+  .chip .n{font-weight:700}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+  .dot.high{background:var(--bad)}.dot.medium{background:var(--mid)}.dot.low{background:var(--good)}.dot.info{background:var(--info)}
+  .share-bar{display:none;gap:8px;margin-top:16px;align-items:center}
+  .share-bar .share-url{flex:1;font-size:12px;color:var(--muted);background:var(--bg-off);border:1px solid var(--line);border-radius:var(--radius-pill);padding:8px 14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .share-bar .btn-share{flex:none}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .toolbar .right{display:flex;gap:8px}
+  .btn{border:1px solid var(--line);background:var(--card);border-radius:var(--radius-pill);padding:9px 18px;font-size:13px;cursor:pointer;color:var(--text);text-decoration:none;font-family:var(--ff-sans);font-weight:500;transition:border-color .2s,background .2s}
+  .btn:hover{background:var(--bg-off);border-color:var(--line-2)}
+
+  /* ── Issue Cards ── */
+  .issue{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-md);margin-bottom:14px;overflow:hidden;padding:24px 24px 20px}
+  .issue .simple-head{display:flex;align-items:center;justify-content:space-between;gap:14px}
+  .issue .simple-head h3{margin:0;font-size:17px;font-weight:700;color:var(--text)}
+  .issue .score-pill{flex:none;border-radius:var(--radius-pill);padding:4px 12px;background:rgba(9,191,65,.1);color:var(--accent-deep);font-size:13px;font-weight:700}
+  .issue .score-pill.bad{background:var(--bad-bg);color:var(--bad)}
+  .issue .score-pill.mid{background:var(--mid-bg);color:var(--mid)}
+  .issue .simple-row{display:flex;gap:18px;margin-top:17px;font-size:14px;line-height:1.6}
+  .issue .simple-label{flex:none;width:32px;color:var(--muted);font-size:12px;font-weight:500}
+  .issue .simple-text{color:var(--text)}
+  .issue .simple-recommendation{border-top:1px dashed var(--line);margin-top:12px;padding-top:12px;color:var(--mid)}
+  .issue summary{list-style:none;display:flex;gap:12px;align-items:flex-start;padding:16px 18px;cursor:pointer}
+  .issue summary::-webkit-details-marker{display:none}
+  .issue summary:hover{background:var(--bg-off)}
+  .badge{flex:none;font-size:11px;font-weight:700;border-radius:6px;padding:3px 8px;margin-top:2px;letter-spacing:.02em}
+  .badge.high{background:var(--bad-bg);color:var(--bad)}.badge.medium{background:var(--mid-bg);color:var(--mid)}.badge.low{background:var(--good-bg);color:var(--good)}.badge.info{background:var(--info-bg);color:var(--info)}
+  .issue .t{flex:1}
+  .issue .t h3{margin:0;font-size:16px;font-weight:600}
+  .issue .t .sub{font-size:13px;color:var(--muted);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap}
+  .issue .t .sub .cat{background:var(--bg-off);border-radius:4px;padding:0 6px}
+  .issue .arrow{color:var(--muted);transition:transform .2s;margin-top:4px}
+  .issue[open] .arrow{transform:rotate(90deg)}
+  .body{padding:0 18px 18px 18px;border-top:1px solid var(--line)}
+  .body h4{margin:16px 0 6px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .body p{margin:0;font-size:14px}
+  .body ol{margin:4px 0 0;padding-left:20px;font-size:14px}
+  .body li{margin:3px 0}
+
+  /* ── Code Block ── */
+  pre{background:var(--bg-dark);color:#e2e8f0;border-radius:var(--radius-sm);padding:14px 16px;font-size:13px;overflow:auto;margin:6px 0 0;position:relative}
+  .copy{position:absolute;right:8px;top:8px;font-size:11px;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:5px;padding:3px 8px;cursor:pointer;transition:background .2s}
+  .copy:hover{background:rgba(255,255,255,.22)}
+
+  /* ── Table ── */
+  .tbl{overflow-x:auto;margin-top:6px}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;max-width:420px;word-break:break-all}
+  th{background:var(--bg-off);font-weight:600;white-space:nowrap}
+  td code{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:var(--bg-off);padding:1px 4px;border-radius:3px}
+  .lhdesc{font-size:13px;color:var(--muted);margin-top:14px}
+  .lhdesc a{color:var(--accent-deep)}
+  .ok{text-align:center;padding:40px;color:var(--good);font-size:18px;font-weight:600}
+
+  /* ── CTA Banner ── */
+  .cta{display:none;margin-top:32px;background:var(--bg-dark);color:#fff;border-radius:var(--radius-sheet);padding:32px 36px;align-items:center;justify-content:space-between;gap:24px}
+  .cta h2{margin:0 0 8px;font-size:20px;font-weight:700;letter-spacing:-.03em;font-family:var(--ff-sans)}
+  .cta p{margin:0;color:rgba(255,255,255,.62);font-size:14px}
+  .cta .btn{background:var(--accent);border-color:var(--accent);color:var(--text);font-weight:700;padding:12px 24px;border-radius:var(--radius-pill)}
+  .cta .btn:hover{background:#07a837;border-color:#07a837}
+  @media(max-width:650px){.cta{padding:24px;flex-direction:column;align-items:flex-start}.cta .btn{margin-top:4px}}
+
+  /* ── Footer ── */
+  footer{margin-top:16px;border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:12px;padding:28px 20px 36px}
+  footer a{color:var(--muted);text-decoration:none}
+  footer a:hover{text-decoration:underline;color:var(--accent-deep)}
+  footer b{color:var(--text);font-weight:600}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="https://daplan.com" target="_blank" rel="noopener" aria-label="동안기획 홈페이지">
+    <span class="brand-mark" aria-hidden="true">d.</span><h1><span>동안기획</span></h1>
+  </a>
+  <h1 style="font-size:15px;margin-left:4px;font-weight:500">구글 SEO 검수</h1>
+  <small>URL을 입력하면 Google로 검사하고 수정할 항목을 알려드립니다</small>
+  <a class="btn header-cta" href="https://daplan.com" target="_blank" rel="noopener">무료 상담 문의</a>
+</div></header>
+
+<main class="wrap">
+  <div class="card">
+    <form id="form">
+      <div class="row">
+        <input type="text" id="url" inputmode="url" placeholder="example.com" required autofocus>
+        <button class="primary" id="go" type="submit">검사 시작</button>
+      </div>
+      <div class="opts">
+        <div class="seg">
+          <label><input type="radio" name="device" value="mobile" checked>모바일</label>
+          <label><input type="radio" name="device" value="desktop">데스크톱</label>
+        </div>
+        <label><input type="checkbox" name="cat" value="seo" checked disabled> SEO (필수)</label>
+        <label><input type="checkbox" name="cat" value="performance" checked> 성능 (Core Web Vitals)</label>
+        <label><input type="checkbox" name="cat" value="accessibility"> 접근성</label>
+        <label><input type="checkbox" name="cat" value="best-practices"> 권장사항</label>
+      </div>
+      <div class="hint">검사에는 보통 20초~1분 정도 걸립니다. 실제 페이지를 불러와 검사하므로 결과는 실행할 때마다 조금씩 달라질 수 있습니다. 인터넷에 공개된 URL만 검사할 수 있습니다.</div>
+    </form>
+    <div id="error"></div>
+  </div>
+
+  <div id="loading" class="card" style="margin-top:20px">
+    <div class="spinner"></div>
+    <p><b id="loading-url"></b> 검사 중…</p>
+    <p id="elapsed">0초 경과</p>
+  </div>
+
+  <section id="result">
+    <div class="card">
+      <div class="top">
+        <div>
+          <div class="meta">
+            <div><b>검사 URL</b> <span id="r-url"></span></div>
+            <div id="r-final-wrap" style="display:none"><b>최종 URL</b> <span id="r-final"></span></div>
+            <div><b>기기</b> <span id="r-device"></span> · <b>검사 시각</b> <span id="r-time"></span> · Lighthouse <span id="r-ver"></span></div>
+          </div>
+          <div class="scores" id="scores"></div>
+          <div class="metrics" id="metrics"></div>
+          <div class="share-bar" id="share-bar">
+            <span class="share-url" id="share-url"></span>
+            <button class="btn btn-share" id="btn-share" type="button">링크 복사</button>
+          </div>
+        </div>
+        <div class="shot" id="shot"></div>
+      </div>
+    </div>
+
+    <div class="summary" id="summary"></div>
+    <div class="toolbar">
+      <div id="count" style="font-size:14px;color:var(--muted)"></div>
+    </div>
+    <div id="issues"></div>
+  </section>
+  <section id="result-cta" class="cta" aria-label="무료 상담 안내">
+    <div><h2>점수 확인에서 끝내지 말고, 실제 개선까지</h2><p>검수 결과를 바탕으로 검색 노출·페이지 속도·문의 전환을 함께 점검해드립니다.</p></div>
+    <a class="btn" href="https://daplan.com" target="_blank" rel="noopener">동안기획에 상담 신청하기</a>
+  </section>
+</main>
+<footer><div>본 도구는 <a href="https://daplan.com" target="_blank" rel="noopener"><b>daplan.com (동안기획)</b></a>에서 제공하는 무료 기술 체크 도구입니다.</div></footer>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const form = $('#form'), urlInput = $('#url'), goBtn = $('#go');
+const loading = $('#loading'), errorBox = $('#error'), result = $('#result');
+let current = null, activeFilter = 'all', timer = null;
+
+const SEV_LABEL = { high: '심각', medium: '주의', low: '경미', info: '수동확인' };
+const STATUS_LABEL = { fail: '실패', warn: '개선 필요', manual: '수동 확인', error: '검사 오류' };
+
+const METRIC_DESC = {
+  'LCP': { name: 'Largest Contentful Paint', desc: '페이지에서 가장 큰 콘텐츠(이미지·텍스트 블록)가 화면에 표시되기까지 걸리는 시간입니다.', good: '2.5초 이하', bad: '4초 초과' },
+  'CLS': { name: 'Cumulative Layout Shift', desc: '페이지 로드 중 요소가 예상치 못하게 이동하는 정도입니다. 낮을수록 안정적인 레이아웃입니다.', good: '0.1 이하', bad: '0.25 초과' },
+  'TBT': { name: 'Total Blocking Time', desc: 'FCP와 TTI 사이에 메인 스레드가 50ms 이상 차단된 총 시간입니다. 사용자 입력 반응성에 영향을 줍니다.', good: '200ms 이하', bad: '600ms 초과' },
+  'FCP': { name: 'First Contentful Paint', desc: '페이지에서 첫 번째 텍스트나 이미지가 화면에 표시되기까지 걸리는 시간입니다.', good: '1.8초 이하', bad: '3초 초과' },
+  'Speed Index': { name: 'Speed Index', desc: '페이지 콘텐츠가 눈에 보이게 채워지는 속도를 측정합니다. 빠를수록 사용자가 콘텐츠를 빨리 볼 수 있습니다.', good: '3.4초 이하', bad: '5.8초 초과' },
+};
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  let url = urlInput.value.trim();
+  if (url && !/^https?:\/\//i.test(url)) url = `https://${url}`;
+  urlInput.value = url;
+  try {
+    const parsed = new URL(url);
+    if (!['http:', 'https:'].includes(parsed.protocol) || !parsed.hostname) throw new Error();
+  } catch {
+    errorBox.textContent = '오류: 올바른 도메인이나 URL을 입력해주세요.';
+    errorBox.style.display = 'block';
+    return;
+  }
+  const device = form.device.value;
+  const categories = [...form.querySelectorAll('input[name=cat]:checked')].map((c) => c.value);
+
+  errorBox.style.display = 'none';
+  result.style.display = 'none';
+  $('#result-cta').style.display = 'none';
+  loading.style.display = 'block';
+  $('#loading-url').textContent = url;
+  goBtn.disabled = true;
+  let sec = 0; $('#elapsed').textContent = '0초 경과';
+  timer = setInterval(() => { sec++; $('#elapsed').textContent = `${sec}초 경과`; }, 1000);
+
+  try {
+    const res = await fetch('/api/audit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url, device, categories }) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || '검사 실패');
+    current = data; activeFilter = 'all';
+    render(data);
+  } catch (err) {
+    errorBox.textContent = '오류: ' + err.message;
+    errorBox.style.display = 'block';
+  } finally {
+    clearInterval(timer);
+    loading.style.display = 'none';
+    goBtn.disabled = false;
+  }
+});
+
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function scoreColor(n) { return n === null ? '#999' : n >= 90 ? 'var(--good)' : n >= 50 ? 'var(--mid)' : 'var(--bad)'; }
+function mdToHtml(s) {
+  return esc(s).replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>').replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+function render(d) {
+  $('#r-url').textContent = d.requestedUrl;
+  if (d.finalUrl && d.finalUrl !== d.requestedUrl) { $('#r-final').textContent = d.finalUrl; $('#r-final-wrap').style.display = ''; } else $('#r-final-wrap').style.display = 'none';
+  $('#r-device').textContent = d.device === 'desktop' ? '데스크톱' : '모바일';
+  $('#r-time').textContent = new Date(d.fetchTime).toLocaleString('ko-KR');
+  $('#r-ver').textContent = d.lighthouseVersion;
+
+  const scoresEl = document.getElementById('scores');
+  scoresEl.textContent = '';
+  Object.entries(d.scores).forEach(([id, s]) => {
+    const gauge = document.createElement('div');
+    gauge.className = 'gauge';
+    const ring = document.createElement('div');
+    ring.className = 'ring';
+    ring.style.setProperty('--p', s.score ?? 0);
+    ring.style.setProperty('--c', scoreColor(s.score));
+    const span = document.createElement('span');
+    span.textContent = s.score ?? '–';
+    ring.appendChild(span);
+    const small = document.createElement('small');
+    small.textContent = s.label;
+    gauge.appendChild(ring);
+    gauge.appendChild(small);
+    scoresEl.appendChild(gauge);
+  });
+
+  const m = d.metrics;
+  const metricsEl = document.getElementById('metrics');
+  metricsEl.textContent = '';
+  if (m) {
+    [
+      ['LCP', m.lcp, (v) => `${(v / 1000).toFixed(2)}s`, [2500, 4000]],
+      ['CLS', m.cls, (v) => v.toFixed(3), [0.1, 0.25]],
+      ['TBT', m.tbt, (v) => `${Math.round(v)}ms`, [200, 600]],
+      ['FCP', m.fcp, (v) => `${(v / 1000).toFixed(2)}s`, [1800, 3000]],
+      ['Speed Index', m.si, (v) => `${(v / 1000).toFixed(2)}s`, [3400, 5800]],
+    ].filter(([, v]) => v != null).forEach(([k, v, f, [g, b]]) => {
+      const div = document.createElement('div');
+      div.className = `metric ${v <= g ? 'good' : v <= b ? 'mid' : 'bad'}`;
+      const bold = document.createElement('b');
+      bold.textContent = f(v);
+      div.appendChild(bold);
+      div.appendChild(document.createTextNode(k));
+      const info = METRIC_DESC[k];
+      if (info) {
+        const tip = document.createElement('span');
+        tip.className = 'tip';
+        tip.textContent = '';
+        const t1 = document.createElement('strong');
+        t1.textContent = info.name;
+        tip.appendChild(t1);
+        tip.appendChild(document.createElement('br'));
+        tip.appendChild(document.createTextNode(info.desc));
+        tip.appendChild(document.createElement('br'));
+        const t2 = document.createTextNode('\u2705 \uC591\uD638: ' + info.good + '  \u274C \uBD88\uB7C9: ' + info.bad);
+        tip.appendChild(t2);
+        div.appendChild(tip);
+      }
+      metricsEl.appendChild(div);
+    });
+  }
+
+  const shotEl = document.getElementById('shot');
+  shotEl.textContent = '';
+  if (d.screenshot) {
+    const img = document.createElement('img');
+    img.src = d.screenshot;
+    img.alt = '페이지 스크린샷';
+    shotEl.appendChild(img);
+  }
+
+  const summaryEl = document.getElementById('summary');
+  summaryEl.textContent = '';
+  const s = d.summary;
+  [
+    ['all', '전체', d.issues.length],
+    ['high', '심각', s.high], ['medium', '주의', s.medium], ['low', '경미', s.low], ['info', '수동 확인', s.info],
+    ...Object.keys(d.scores).map((c) => ['cat:' + c, d.scores[c].label, d.issues.filter((i) => i.category === c).length]),
+  ].forEach(([key, label, n]) => {
+    const btn = document.createElement('button');
+    btn.className = `chip ${activeFilter === key ? 'active' : ''}`;
+    btn.dataset.f = key;
+    if (key in SEV_LABEL) {
+      const dot = document.createElement('i');
+      dot.className = `dot ${key}`;
+      btn.appendChild(dot);
+    }
+    btn.appendChild(document.createTextNode(label + ' '));
+    const nSpan = document.createElement('span');
+    nSpan.className = 'n';
+    nSpan.textContent = n;
+    btn.appendChild(nSpan);
+    btn.addEventListener('click', () => { activeFilter = key; render(current); });
+    summaryEl.appendChild(btn);
+  });
+
+  const list = d.issues
+    .filter((i) => activeFilter === 'all' || i.severity === activeFilter || ('cat:' + i.category) === activeFilter)
+    .sort((a, b) => ({ high: 0, medium: 1, low: 2, info: 3 }[a.severity] ?? 4) - ({ high: 0, medium: 1, low: 2, info: 3 }[b.severity] ?? 4))
+    .slice(0, 12);
+
+  const countEl = document.getElementById('count');
+  countEl.textContent = list.length ? `핵심 개선 항목 ${list.length}개` : '';
+
+  const issuesEl = document.getElementById('issues');
+  issuesEl.textContent = '';
+  if (list.length) {
+    list.forEach((i) => {
+      const article = document.createElement('article');
+      article.className = 'issue';
+
+      const head = document.createElement('div');
+      head.className = 'simple-head';
+      const h3 = document.createElement('h3');
+      h3.textContent = i.title;
+      const pill = document.createElement('span');
+      const pillClass = i.severity === 'high' ? 'bad' : i.severity === 'medium' ? 'mid' : '';
+      pill.className = `score-pill ${pillClass}`;
+      const score = i.score == null ? null : Math.round(i.score);
+      pill.textContent = score == null ? SEV_LABEL[i.severity] : `${score}/100점`;
+      head.appendChild(h3);
+      head.appendChild(pill);
+      article.appendChild(head);
+
+      const status = i.status === 'fail' ? '개선이 필요합니다.' : i.status === 'warn' ? '일부 개선이 필요합니다.' : i.status === 'manual' ? '직접 확인이 필요합니다.' : '확인되었습니다.';
+      const row1 = document.createElement('div');
+      row1.className = 'simple-row';
+      const label1 = document.createElement('span');
+      label1.className = 'simple-label';
+      label1.textContent = '상태';
+      const text1 = document.createElement('span');
+      text1.className = 'simple-text';
+      text1.textContent = i.displayValue || status;
+      row1.appendChild(label1);
+      row1.appendChild(text1);
+      article.appendChild(row1);
+
+      if (i.severity === 'high' || i.severity === 'medium' || i.status === 'fail' || i.status === 'warn') {
+        const recommendation = i.fix?.[0] || i.displayValue || '현재 항목을 확인해보세요.';
+        const row2 = document.createElement('div');
+        row2.className = 'simple-row simple-recommendation';
+        const label2 = document.createElement('span');
+        label2.className = 'simple-label';
+        label2.textContent = '권장';
+        const text2 = document.createElement('span');
+        text2.className = 'simple-text';
+        text2.textContent = recommendation;
+        row2.appendChild(label2);
+        row2.appendChild(text2);
+        article.appendChild(row2);
+      }
+
+      issuesEl.appendChild(article);
+    });
+  } else {
+    const okDiv = document.createElement('div');
+    okDiv.className = 'card ok';
+    okDiv.textContent = '이 필터에 해당하는 문제가 없습니다';
+    issuesEl.appendChild(okDiv);
+  }
+
+  // 공유 링크 생성 및 URL 업데이트
+  const shareParams = new URLSearchParams();
+  shareParams.set('url', d.requestedUrl);
+  if (d.device === 'desktop') shareParams.set('device', 'desktop');
+  const shareLink = location.origin + location.pathname + '?' + shareParams.toString();
+  history.replaceState(null, '', '?' + shareParams.toString());
+  const shareUrlEl = document.getElementById('share-url');
+  shareUrlEl.textContent = shareLink;
+  document.getElementById('share-bar').style.display = 'flex';
+
+  result.style.display = 'block';
+  $('#result-cta').style.display = 'flex';
+  result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// 공유 링크 복사 버튼
+document.getElementById('btn-share').addEventListener('click', () => {
+  const url = document.getElementById('share-url').textContent;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('btn-share');
+    btn.textContent = '복사됨';
+    setTimeout(() => { btn.textContent = '링크 복사'; }, 1500);
+  });
+});
+
+// ?url=...&device=desktop 로 접속하면 자동 실행 (북마크/공유용)
+(() => {
+  const q = new URLSearchParams(location.search);
+  const u = q.get('url');
+  if (!u) return;
+  urlInput.value = u;
+  if (q.get('device') === 'desktop') form.device.value = 'desktop';
+  form.requestSubmit();
+})();
+
+const copyMdButton = $('#copy-md');
+if (copyMdButton) copyMdButton.addEventListener('click', () => {
+  if (!current) return;
+  const d = current;
+  const lines = [`# SEO 검수 결과 - ${d.finalUrl}`, `- 검사 시각: ${new Date(d.fetchTime).toLocaleString('ko-KR')} (${d.device === 'desktop' ? '데스크톱' : '모바일'})`,
+    `- 점수: ${Object.values(d.scores).map((s) => `${s.label} ${s.score ?? '-'}`).join(' / ')}`, ''];
+  for (const sev of ['high', 'medium', 'low', 'info']) {
+    const items = d.issues.filter((i) => i.severity === sev);
+    if (!items.length) continue;
+    lines.push(`## ${SEV_LABEL[sev]} (${items.length})`);
+    for (const i of items) {
+      lines.push(`- [ ] **${i.title}** (${i.categoryLabel}${i.displayValue ? ', ' + i.displayValue : ''})`);
+      i.fix.forEach((f) => lines.push(`  - ${f}`));
+      if (i.rows.length) i.rows.slice(0, 10).forEach((r) => lines.push(`  - \`${r.filter(Boolean).join(' | ').slice(0, 160)}\``));
+    }
+    lines.push('');
+  }
+  navigator.clipboard.writeText(lines.join('\n'));
+  const b = $('#copy-md'); const t = b.textContent; b.textContent = '복사되었습니다'; setTimeout(() => (b.textContent = t), 1500);
+});
+</script>
+</body>
+</html>
